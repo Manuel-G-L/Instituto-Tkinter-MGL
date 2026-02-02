@@ -32,4 +32,4 @@ class AsignaturaController:
 
         asig = Asignatura(id_asig=id_asig, nombre=nombre, departamento=departamento)
         asig.modificar()
-        return "Asignatura actualizada correctamente."
+        return "Asignatura modificada correctamente."
