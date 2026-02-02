@@ -11,7 +11,7 @@ class DatabaseManager:
 
 
 
-    # Crear Conexión
+    # Crear Conexion
     def create_connection(self):
 
         # Crea una conexión a la base de datos SQLite.
