@@ -1,0 +1,6 @@
+Proyector Epson,1
+Pizarra Digital,1
+Monitor Dell 24,2
+Kit Robótica Arduino,2
+Impresora 3D,2
+Altavoces Logitech,1
