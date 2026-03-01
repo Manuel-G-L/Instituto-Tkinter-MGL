@@ -1,0 +1,15 @@
+SISTEMA DE GESTIÓN INSTITUTO - MANUAL DE USUARIO
+
+1. ACCESO:
+   - Use el email 'admin@instituto.com' y el ID '1' para entrar.
+
+2. GESTIÓN DE PERSONAS:
+   - Permite registrar Alumnos (con matrícula), Profesores (depto) y Dirección (cargo).
+
+3. CALIFICACIONES:
+   - Acceda desde el Menú Principal -> Ver Calificaciones.
+   - Use 'Anterior' y 'Siguiente' para navegar entre los alumnos registrados.
+   - Pulse 'Exportar CSV' para generar un informe de notas del alumno actual.
+
+4. MATERIALES:
+   - Se pueden añadir uno a uno o cargar un archivo .txt con nombres de materiales.

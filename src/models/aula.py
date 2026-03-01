@@ -38,7 +38,7 @@ class Aula:
 
 
 
-    # Métodos
+    # Métodos a usar
     def registrar(self):
         sql = "INSERT INTO aulas (numero, capacidad) VALUES (?, ?)"
         self.__id = self.db.execute_query(sql, (self.__numero, self.__capacidad))

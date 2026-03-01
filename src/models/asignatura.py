@@ -38,7 +38,7 @@ class Asignatura:
 
 
 
-    # Métodos
+    # Métodos a usar
     def registrar(self):
         sql = "INSERT INTO asignaturas (nombre, departamento) VALUES (?, ?)"
         self.__id = self.db.execute_query(sql, (self.__nombre, self.__departamento))

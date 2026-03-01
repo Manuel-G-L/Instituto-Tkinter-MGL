@@ -1,146 +1,305 @@
 import sqlite3
 from sqlite3 import Error
 
-class DatabaseManager:
 
+class DatabaseManager:
     def __init__(self, db_file="instituto.db"):
         self.db_file = db_file
 
-        # Creamos las tablas automáticamente al instanciar el manager
+        # Creamos las tablas
         self.setup_tables()
 
+        # Insertamos los datos iniciales
+        self.populate_initial_data()
 
-
-    # Crear Conexion
     def create_connection(self):
-
-        # Crea una conexión a la base de datos SQLite.
         conn = None
         try:
+
+            # Conectamos a la BD
             conn = sqlite3.connect(self.db_file)
             return conn
         except Error as e:
+
+            # Gestion de errores
             print(f"Error al conectar a la base de datos: {e}")
         return conn
 
-
-
-    # Crear Tablas
+    # Creamos las tablas
     def setup_tables(self):
-
-        # Crear la estructura de la BD en 3ª Forma Normal
-        # Incluye Personas, Aulas, Materiales, Asignaturas y Clases
         script_tablas = """
-        
-        CREATE TABLE IF NOT EXISTS personas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            apellidos TEXT NOT NULL,
-            email TEXT UNIQUE,
-            rol TEXT NOT NULL, -- 'alumno', 'profesor', 'direccion'
-            extra_info TEXT    -- Para matrícula, departamento o cargo
-        );
+                        CREATE TABLE IF NOT EXISTS personas \
+                        ( \
+                            id \
+                            INTEGER \
+                            PRIMARY \
+                            KEY \
+                            AUTOINCREMENT, \
+                            nombre \
+                            TEXT \
+                            NOT \
+                            NULL, \
+                            apellidos \
+                            TEXT \
+                            NOT \
+                            NULL, \
+                            email \
+                            TEXT \
+                            UNIQUE, \
+                            rol \
+                            TEXT \
+                            NOT \
+                            NULL, \
+                            extra_info \
+                            TEXT
+                        );
 
-        CREATE TABLE IF NOT EXISTS aulas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            numero TEXT NOT NULL,
-            capacidad INTEGER NOT NULL
-        );
+                        CREATE TABLE IF NOT EXISTS aulas \
+                        ( \
+                            id \
+                            INTEGER \
+                            PRIMARY \
+                            KEY \
+                            AUTOINCREMENT, \
+                            numero \
+                            TEXT \
+                            NOT \
+                            NULL, \
+                            capacidad \
+                            INTEGER \
+                            NOT \
+                            NULL
+                        );
 
-        CREATE TABLE IF NOT EXISTS materiales (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            id_aula INTEGER,
-            FOREIGN KEY (id_aula) REFERENCES aulas (id) ON DELETE CASCADE
-        );
+                        CREATE TABLE IF NOT EXISTS materiales \
+                        ( \
+                            id \
+                            INTEGER \
+                            PRIMARY \
+                            KEY \
+                            AUTOINCREMENT, \
+                            nombre \
+                            TEXT \
+                            NOT \
+                            NULL, \
+                            id_aula \
+                            INTEGER, \
+                            FOREIGN \
+                            KEY \
+                        ( \
+                            id_aula \
+                        ) REFERENCES aulas \
+                        ( \
+                            id \
+                        ) ON DELETE CASCADE
+                            );
 
-        CREATE TABLE IF NOT EXISTS asignaturas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            departamento TEXT NOT NULL
-        );
+                        CREATE TABLE IF NOT EXISTS asignaturas \
+                        ( \
+                            id \
+                            INTEGER \
+                            PRIMARY \
+                            KEY \
+                            AUTOINCREMENT, \
+                            nombre \
+                            TEXT \
+                            NOT \
+                            NULL, \
+                            departamento \
+                            TEXT \
+                            NOT \
+                            NULL
+                        );
 
-        CREATE TABLE IF NOT EXISTS clases (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_profesor INTEGER,
-            id_aula INTEGER,
-            id_asignatura INTEGER,
-            anio_academico TEXT NOT NULL,
-            FOREIGN KEY (id_profesor) REFERENCES personas (id),
-            FOREIGN KEY (id_aula) REFERENCES aulas (id),
-            FOREIGN KEY (id_asignatura) REFERENCES asignaturas (id)
-        );
-        """
+                        CREATE TABLE IF NOT EXISTS clases \
+                        ( \
+                            id \
+                            INTEGER \
+                            PRIMARY \
+                            KEY \
+                            AUTOINCREMENT, \
+                            id_profesor \
+                            INTEGER, \
+                            id_aula \
+                            INTEGER, \
+                            id_asignatura \
+                            INTEGER, \
+                            anio_academico \
+                            TEXT \
+                            NOT \
+                            NULL, \
+                            FOREIGN \
+                            KEY \
+                        ( \
+                            id_profesor \
+                        ) REFERENCES personas \
+                        ( \
+                            id \
+                        ),
+                            FOREIGN KEY \
+                        ( \
+                            id_aula \
+                        ) REFERENCES aulas \
+                        ( \
+                            id \
+                        ),
+                            FOREIGN KEY \
+                        ( \
+                            id_asignatura \
+                        ) REFERENCES asignaturas \
+                        ( \
+                            id \
+                        )
+                            );
 
+                        CREATE TABLE IF NOT EXISTS calificaciones \
+                        ( \
+                            id \
+                            INTEGER \
+                            PRIMARY \
+                            KEY \
+                            AUTOINCREMENT, \
+                            id_alumno \
+                            INTEGER, \
+                            id_asignatura \
+                            INTEGER, \
+                            nota \
+                            REAL \
+                            CHECK \
+                        ( \
+                            nota \
+                            >= \
+                            0 \
+                            AND \
+                            nota \
+                            <= \
+                            10 \
+                        ),
+                            convocatoria TEXT,
+                            anio TEXT,
+                            FOREIGN KEY \
+                        ( \
+                            id_alumno \
+                        ) REFERENCES personas \
+                        ( \
+                            id \
+                        ),
+                            FOREIGN KEY \
+                        ( \
+                            id_asignatura \
+                        ) REFERENCES asignaturas \
+                        ( \
+                            id \
+                        )
+                            ); \
+                        """
+
+        # Creamos la conexion
         conn = self.create_connection()
         if conn:
             try:
+
+                # Creamos el cursor y ejecutamos las tablas
                 cursor = conn.cursor()
                 cursor.executescript(script_tablas)
                 conn.commit()
+
             except Error as e:
+
+                # Gestion de errores
                 print(f"Error al crear las tablas: {e}")
             finally:
                 conn.close()
 
-        # DATOS INICIALES (PARA EL LOGIN)
-        def populate_initial_data(self):
+    # Datos iniciales
+    def populate_initial_data(self):
 
-            # Comprobamos si ya hay datos
-            check = self.fetch_all("SELECT id FROM personas LIMIT 1")
-            if not check:
-                print("Insertando datos de prueba iniciales...")
+        # Comprobamos si ya existe el admin para no duplicarlo cada vez que abras la app
+        check = self.fetch_all("SELECT id FROM personas WHERE email = 'admin@instituto.com'")
 
-                # Personas (ID 1 será admin, ID 2 profe, ID 3 alumno)
-                usuarios = []
+        if not check:
+            print("Base de datos vacía. Insertando administrador por defecto...")
 
-                for u in usuarios:
-                    self.execute_query(
-                        "INSERT INTO personas (nombre, apellidos, email, rol, extra_info) VALUES (?,?,?,?,?)", u)
+            # Insertamos al Administrador (ID 1)
+            self.execute_query(
+                "INSERT INTO personas (nombre, apellidos, email, rol, extra_info) VALUES (?,?,?,?,?)",
+                ("Admin", "Instituto", "admin@instituto.com", "direccion", "Director General")
+            )
 
-                # Aulas
-                self.execute_query("INSERT INTO aulas (numero, capacidad) VALUES (?,?)", ("101", 30))
-                self.execute_query("INSERT INTO aulas (numero, capacidad) VALUES (?,?)", ("Laboratorio", 20))
+            # Insertamos un Alumno de prueba (ID 2) para que la pantalla de notas no esté vacía
+            self.execute_query(
+                "INSERT INTO personas (nombre, apellidos, email, rol, extra_info) VALUES (?,?,?,?,?)",
+                ("Juan", "García", "juan@alumno.com", "alumno", "MAT-2024-001")
+            )
 
-                # Asignaturas
-                self.execute_query("INSERT INTO asignaturas (nombre, departamento) VALUES (?,?)",
-                                   ("Python", "Informática"))
+            # Una asignatura de prueba
+            self.execute_query(
+                "INSERT INTO asignaturas (nombre, departamento) VALUES (?,?)",
+                ("Python Avanzado", "Informática")
+            )
 
-                print("Datos insertados. Puedes usar: admin@instituto.com con ID: 1")
+            # Una nota de prueba para Juan
+            self.execute_query(
+                "INSERT INTO calificaciones (id_alumno, id_asignatura, nota, convocatoria, anio) VALUES (?,?,?,?,?)",
+                (2, 1, 9.5, "Ordinaria", "2023-24")
+            )
 
+            print("¡Hecho! Login: admin@instituto.com | Contraseña: 1")
 
-
-    # Ejecutar Consultas
+    # Ejecutamos una consulta
     def execute_query(self, query, params=()):
 
-        # Ejecuta una consulta (INSERT, UPDATE, DELETE)
+        # Creamos una conexión a la BD
         conn = self.create_connection()
-
         if conn:
             try:
+
+                # Hacemos al consulta
                 cursor = conn.cursor()
                 cursor.execute(query, params)
                 conn.commit()
                 return cursor.lastrowid
+
             except Error as e:
+
+                # Gestion de errores
                 print(f"Error ejecutando consulta: {e}")
                 return None
             finally:
+
+                # Cerramos la conexión
                 conn.close()
         return None
 
+    # Ejecuta una consulta de selección (SELECT) en la base de datos y devuelve todos los registros encontrados.
     def fetch_all(self, query, params=()):
 
-        # Recupera todos los resultados de una consulta (SELECT)
+        # Intentamos establecer conexión con el archivo .db
         conn = self.create_connection()
+
         if conn:
             try:
+
+                # Creamos un cursor
                 cursor = conn.cursor()
+
+                # Ejecutamos la sentencia SQL recibida.
+                # Se pasan 'params' de forma segura para evitar Inyección SQL.
                 cursor.execute(query, params)
+
+                # Retornamos una lista con todas las filas obtenidas
                 return cursor.fetchall()
+
             except Error as e:
+
+                # Gestion de errores
                 print(f"Error al recuperar datos: {e}")
                 return []
+
             finally:
+
+                # Cerramos la conexión
                 conn.close()
+
+        # Si la conexión no se pudo establecer, devolvemos una lista vacía
         return []

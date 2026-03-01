@@ -28,7 +28,7 @@ class Persona:
 
 
 
-    # Métodos de Gestión
+    # Métodos de Gestión a usar
     def registrar(self, info_adicional=""):
         sql = "INSERT INTO personas (nombre, apellidos, email, rol, extra_info) VALUES (?, ?, ?, ?, ?)"
         params = (self.__nombre, self.__apellidos, self.__email, self.__rol, info_adicional)

@@ -31,7 +31,7 @@ class Clase:
 
 
 
-    # Métodos
+    # Métodos a usar
     def registrar(self):
         sql = "INSERT INTO clases (id_profesor, id_aula, id_asignatura, anio_academico) VALUES (?, ?, ?, ?)"
         params = (self.__id_profesor, self.__id_aula, self.__id_asignatura, self.__anio_academico)
