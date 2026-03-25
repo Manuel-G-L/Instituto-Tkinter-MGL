@@ -51,7 +51,6 @@ class Material:
         return self.db.execute_query(sql, (self.__id,))
 
 
-
     # Metodo para importar los materiales desde un archivo
     @staticmethod
     def importar_desde_archivo(ruta_archivo, aula_id):

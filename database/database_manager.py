@@ -229,7 +229,12 @@ class DatabaseManager:
             # Insertamos un Alumno de prueba (ID 2) para que la pantalla de notas no esté vacía
             self.execute_query(
                 "INSERT INTO personas (nombre, apellidos, email, rol, extra_info) VALUES (?,?,?,?,?)",
-                ("Juan", "García", "juan@alumno.com", "alumno", "MAT-2024-001")
+                ("Juan", "García", "juan@alumno.com", "alumno", "MAT-2026-001")
+            )
+
+            self.execute_query(
+                "INSERT INTO personas (nombre, apellidos, email, rol, extra_info) VALUES (?,?,?,?,?)",
+                ("Javi", "Garcia", "javi@alumno.com", "alumno", "MAT-2026-006")
             )
 
             # Una asignatura de prueba
@@ -242,6 +247,11 @@ class DatabaseManager:
             self.execute_query(
                 "INSERT INTO calificaciones (id_alumno, id_asignatura, nota, convocatoria, anio) VALUES (?,?,?,?,?)",
                 (2, 1, 9.5, "Ordinaria", "2023-24")
+            )
+
+            self.execute_query(
+                "INSERT INTO calificaciones (id_alumno, id_asignatura, nota, convocatoria, anio) VALUES (?,?,?,?,?)",
+                (3, 1, 6, "Ordinaria", "2024-25")
             )
 
             print("¡Hecho! Login: admin@instituto.com | Contraseña: 1")
